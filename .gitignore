@@ -1,6 +1,5 @@
 # Ignorar archivos y carpetas grandes o temporales
-*.csv
-data/
+
 __pycache__/
 .ipynb_checkpoints/
 *.pyc
