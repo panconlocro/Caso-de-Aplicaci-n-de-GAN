@@ -1,0 +1,35 @@
+@startuml anogan_architecture
+skinparam rectangle {
+  BackgroundColor #f3f3f3
+  BorderColor #333333
+  BorderRadius 20
+}
+actor "Imagen de entrada" as Input
+rectangle "Encoder\n(Convolucional)" as Encoder
+rectangle "Vector Latente z" as Latent
+rectangle "Generador\n(Deconvolucional)" as Generator
+rectangle "Reconstrucción" as Recon
+rectangle "Discriminador\n(Convolucional)" as Discriminator
+database "Base de imágenes\n(solo healthy)" as Dataset
+
+Input --> Encoder : x (healthy or anomaly)
+Encoder --> Latent : codifica a z
+Latent --> Generator : genera x'
+Generator --> Recon : x' (reconstrucción)
+Recon --> Discriminator : x'
+Input --> Discriminator : x
+
+Dataset --> Encoder : entrenamiento
+Dataset --> Generator : entrenamiento
+Dataset --> Discriminator : entrenamiento
+
+note right: Entrenamiento: solo imágenes healthy\nInferencia: healthy y anomaly
+
+rectangle "Score de Anomalía" as Score 
+
+Recon --> Score : Error de reconstrucción
+Discriminator --> Score : Score del discriminador
+Input ..> Score : Score final
+
+
+@enduml
