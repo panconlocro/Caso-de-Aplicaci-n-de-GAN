@@ -1,35 +1,40 @@
-@startuml anogan_architecture
+@startuml ganomaly_architecture
 skinparam rectangle {
   BackgroundColor #f3f3f3
   BorderColor #333333
   BorderRadius 20
 }
 actor "Imagen de entrada" as Input
-rectangle "Encoder\n(Convolucional)" as Encoder
+rectangle "Encoder E\n(Convolucional)" as Encoder
 rectangle "Vector Latente z" as Latent
-rectangle "Generador\n(Deconvolucional)" as Generator
-rectangle "Reconstrucción" as Recon
+rectangle "Generador G\n(Deconvolucional)" as Generator
+rectangle "Reconstrucción x'" as Recon
+rectangle "Encoder E2\n(Convolucional)" as Encoder2
+rectangle "Vector Latente z'" as Latent2
 rectangle "Discriminador\n(Convolucional)" as Discriminator
 database "Base de imágenes\n(solo healthy)" as Dataset
 
-Input --> Encoder : x (healthy or anomaly)
+Input --> Encoder : x (healthy o anomaly)
 Encoder --> Latent : codifica a z
 Latent --> Generator : genera x'
 Generator --> Recon : x' (reconstrucción)
+Recon --> Encoder2 : x'
+Encoder2 --> Latent2 : codifica a z'
 Recon --> Discriminator : x'
 Input --> Discriminator : x
 
 Dataset --> Encoder : entrenamiento
 Dataset --> Generator : entrenamiento
 Dataset --> Discriminator : entrenamiento
+Dataset --> Encoder2 : entrenamiento
 
 note right: Entrenamiento: solo imágenes healthy\nInferencia: healthy y anomaly
 
-rectangle "Score de Anomalía" as Score 
+rectangle "Score de Anomalía" as Score
 
-Recon --> Score : Error de reconstrucción
-Discriminator --> Score : Score del discriminador
+Recon --> Score : Error de reconstrucción (x vs x')
+Latent --> Score : Error latente (z vs z')
+Discriminator --> Score : Score adversarial (opcional)
 Input ..> Score : Score final
-
 
 @enduml
